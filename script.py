@@ -7,7 +7,6 @@ import customtkinter as ctk
 from PIL import Image
 from tkinter import filedialog, messagebox
 
-
 def resource_path(relative_path):
     """Get the absolute path to a resource. Works for dev and PyInstaller."""
     try:
