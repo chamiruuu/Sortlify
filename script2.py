@@ -7,16 +7,15 @@ from tkinter import filedialog, messagebox
 
 # Set the dark appearance mode.
 ctk.set_appearance_mode("dark")
-# (You can further customize the default color theme if needed.)
 
 class FileSorterApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Advanced File Sorter")
-        self.geometry("1000x700")
+        self.geometry("1000x700")  # Default size for larger screens.
         self.minsize(800, 600)  # Minimum window size
+        self.geometry("800x600")  # Ensure the window opens at the minimum size.
         self.selected_folder = None
-
         self.create_widgets()
 
     def create_widgets(self):
@@ -34,6 +33,7 @@ class FileSorterApp(ctk.CTk):
 
         self.names_label = ctk.CTkLabel(self.left_frame, text="File Names (one per line):")
         self.names_label.pack(anchor="nw", padx=10, pady=(10, 5))
+
         self.names_textbox = ctk.CTkTextbox(self.left_frame)
         self.names_textbox.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
@@ -45,34 +45,40 @@ class FileSorterApp(ctk.CTk):
         # --- Folder Selection Section ---
         self.folder_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
         self.folder_frame.pack(fill="x", padx=10, pady=(10, 5))
+
         self.folder_label = ctk.CTkLabel(self.folder_frame, text="Select Folder:")
         self.folder_label.pack(side="left", padx=10, pady=10)
+
         self.folder_button = ctk.CTkButton(self.folder_frame, text="Browse", command=self.select_folder)
         self.folder_button.pack(side="left", padx=10, pady=10)
+
         # Folder path display styled like a code block.
         self.folder_path_var = ctk.StringVar(value="No folder selected")
         self.folder_path_display = ctk.CTkLabel(
-            self.folder_frame, 
-            textvariable=self.folder_path_var, 
-            anchor="w", 
+            self.folder_frame,
+            textvariable=self.folder_path_var,
+            anchor="w",
             font=("Courier", 10),
             fg_color="#2b2b2b",  # Slightly lighter block background
             corner_radius=4,
-            padx=10, pady=10
+            padx=10, pady=5
         )
         self.folder_path_display.pack(side="left", fill="x", expand=True, padx=10, pady=10)
 
         # --- Dynamic File Types Section ---
         self.file_types_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
-        self.file_types_frame.pack(fill="both", padx=10, pady=5)
+        self.file_types_frame.pack(fill="both", padx=10, pady=(5, 10))
+
         # This section will be populated when a folder is selected.
         self.file_type_vars = {}
 
         # --- Action Selection Section (Copy/Move) ---
         self.action_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
-        self.action_frame.pack(fill="x", padx=10, pady=5)
+        self.action_frame.pack(fill="x", padx=10, pady=(5, 10))
+
         self.action_label = ctk.CTkLabel(self.action_frame, text="Action:")
         self.action_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
         self.action_var = ctk.StringVar(value="copy")
         self.radio_copy = ctk.CTkRadioButton(self.action_frame, text="Copy", variable=self.action_var, value="copy")
         self.radio_move = ctk.CTkRadioButton(self.action_frame, text="Move", variable=self.action_var, value="move")
@@ -82,24 +88,28 @@ class FileSorterApp(ctk.CTk):
 
         # --- Buttons Section: Process (Sort) & Reset ---
         self.button_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
-        self.button_frame.pack(fill="x", padx=10, pady=5)
+        self.button_frame.pack(fill="x", padx=10, pady=(5, 10))
+
         self.process_button = ctk.CTkButton(self.button_frame, text="Sort Files", command=self.process_files)
         self.process_button.grid(row=0, column=0, padx=20, pady=10, sticky="ew")
+
         self.reset_button = ctk.CTkButton(self.button_frame, text="Reset", command=self.reset_ui)
         self.reset_button.grid(row=0, column=1, padx=20, pady=10, sticky="ew")
+
         self.button_frame.grid_columnconfigure(0, weight=1)
         self.button_frame.grid_columnconfigure(1, weight=1)
 
         # --- Progress Indicator Section ---
         self.progress_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
-        self.progress_frame.pack(fill="x", padx=10, pady=5)
+        self.progress_frame.pack(fill="x", padx=10, pady=(5, 10))
+
         self.progress_bar = ctk.CTkProgressBar(self.progress_frame)
         self.progress_bar.set(0)
         self.progress_bar.pack(fill="x", padx=10, pady=10)
 
         # --- Notification Section ---
         self.notification_label = ctk.CTkLabel(self.right_frame, text="", font=ctk.CTkFont(size=14))
-        self.notification_label.pack(pady=5)
+        self.notification_label.pack(pady=(5, 10))
 
     def select_folder(self):
         folder = filedialog.askdirectory()
@@ -113,6 +123,7 @@ class FileSorterApp(ctk.CTk):
         for widget in self.file_types_frame.winfo_children():
             widget.destroy()
         self.file_type_vars = {}
+
         if self.selected_folder:
             try:
                 files = [f for f in os.listdir(self.selected_folder)
@@ -120,23 +131,39 @@ class FileSorterApp(ctk.CTk):
             except Exception as e:
                 messagebox.showerror("Error", f"Could not list files in folder: {str(e)}")
                 return
+
             exts = set()
             for file in files:
                 ext = os.path.splitext(file)[1].lower()
                 if ext:
                     exts.add(ext)
             exts = sorted(exts)
+
             if not exts:
                 label = ctk.CTkLabel(self.file_types_frame, text="No file types found in this folder.")
                 label.pack(padx=10, pady=10)
             else:
-                label = ctk.CTkLabel(self.file_types_frame, text="Select File Types:")
-                label.pack(anchor="w", padx=10, pady=(10, 5))
-                for ext in exts:
+                # Create a scrollable frame for file types.
+                scrollable_frame = ctk.CTkScrollableFrame(self.file_types_frame, fg_color="#1a1a1a")
+                scrollable_frame.pack(fill="both", expand=True, padx=10, pady=5)
+
+                label = ctk.CTkLabel(scrollable_frame, text="Select File Types:")
+                label.grid(row=0, column=0, sticky="w", padx=10, pady=(10, 5))
+
+                # Arrange checkboxes in a grid layout.
+                row, col = 1, 0
+                max_cols = 4  # Maximum number of columns for file type checkboxes.
+                for idx, ext in enumerate(exts):
                     var = ctk.BooleanVar(value=False)
                     self.file_type_vars[ext] = var
-                    cb = ctk.CTkCheckBox(self.file_types_frame, text=ext, variable=var)
-                    cb.pack(anchor="w", padx=20, pady=5)
+                    cb = ctk.CTkCheckBox(scrollable_frame, text=ext, variable=var)
+                    cb.grid(row=row, column=col, sticky="w", padx=10, pady=5)
+
+                    # Update grid position.
+                    col += 1
+                    if col >= max_cols:
+                        col = 0
+                        row += 1
 
     def reset_ui(self):
         self.selected_folder = None
@@ -162,6 +189,7 @@ class FileSorterApp(ctk.CTk):
             for ext, var in self.file_type_vars.items():
                 if var.get():
                     selected_extensions.append(ext)
+
         # If no checkboxes are selected, process all files.
         if not selected_extensions:
             selected_extensions = None
@@ -169,7 +197,6 @@ class FileSorterApp(ctk.CTk):
         # Read file names from the textbox (one per line).
         names_input = self.names_textbox.get("1.0", "end").strip().splitlines()
         names_set = {name.strip() for name in names_input if name.strip()}
-
         action = self.action_var.get()  # Either "copy" or "move"
 
         # Run file processing in a separate thread.
@@ -216,6 +243,7 @@ class FileSorterApp(ctk.CTk):
             while os.path.exists(dest_path):
                 dest_path = os.path.join(dest_folder, f"{base}_{counter}{ext}")
                 counter += 1
+
             try:
                 if action == "copy":
                     shutil.copy2(src_path, dest_path)
@@ -223,6 +251,7 @@ class FileSorterApp(ctk.CTk):
                     shutil.move(src_path, dest_path)
             except Exception as e:
                 self.show_notification(f"Error processing {file}: {str(e)}", error=True)
+
             progress = (idx + 1) / total_files
             self.progress_bar.set(progress)
             time.sleep(0.1)  # Simulate processing time
@@ -235,6 +264,7 @@ class FileSorterApp(ctk.CTk):
         color = "red" if error else "green"
         self.notification_label.configure(text=message, text_color=color)
         self.after(3000, lambda: self.notification_label.configure(text=""))
+
 
 if __name__ == "__main__":
     app = FileSorterApp()
