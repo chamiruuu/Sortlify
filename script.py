@@ -1,3 +1,4 @@
+import sys
 import os
 import shutil
 import threading
@@ -6,13 +7,23 @@ import customtkinter as ctk
 from PIL import Image
 from tkinter import filedialog, messagebox
 
+def resource_path(relative_path):
+    """Get the absolute path to a resource. Works for dev and PyInstaller."""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS during runtime
+        base_path = sys._MEIPASS
+    except AttributeError:
+        # If not in a PyInstaller bundle, use the current directory
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 # Set the dark appearance mode.
 ctk.set_appearance_mode("dark")
 
 class FileSorterApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Advanced File Sorter")
+        self.title("Sortlify")
         self.geometry("1000x700")  # Default size for larger screens.
         self.minsize(800, 600)  # Minimum window size
         self.geometry("800x600")  # Ensure the window opens at the minimum size.
@@ -36,13 +47,12 @@ class FileSorterApp(ctk.CTk):
         # Label and Paste Button in the same row
         self.names_label_frame = ctk.CTkFrame(self.left_frame, fg_color="#1a1a1a")
         self.names_label_frame.pack(anchor="nw", fill="x", padx=10, pady=(10, 5))
-
         self.names_label = ctk.CTkLabel(self.names_label_frame, text="File Names (one per line):")
         self.names_label.pack(side="left", padx=(0, 5), pady=5)
 
         # Paste Button with an icon
         self.paste_icon = ctk.CTkImage(
-            light_image=Image.open("./pasteicon.png"),  # Path to your icon
+            light_image=Image.open(resource_path("pasteicon.png")),  # Correct path for PyInstaller
             size=(20, 20)  # Set the desired size of the icon
         )
         self.paste_button = ctk.CTkButton(
@@ -64,7 +74,7 @@ class FileSorterApp(ctk.CTk):
         self.names_textbox.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
         # Line count label
-        self.line_count_label = ctk.CTkLabel(self.left_frame, text="Lines: 0", anchor="w", font=("Courier", 10))
+        self.line_count_label = ctk.CTkLabel(self.left_frame, text="File names: 0", anchor="w", font=("Courier", 10))
         self.line_count_label.pack(anchor="sw", padx=10, pady=(0, 10))
 
         # Bind the textbox to update line count on key release
@@ -78,10 +88,8 @@ class FileSorterApp(ctk.CTk):
         # --- Folder Selection Section ---
         self.folder_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
         self.folder_frame.pack(fill="x", padx=10, pady=(0, 10))
-
         self.folder_label = ctk.CTkLabel(self.folder_frame, text="Select Folder:")
         self.folder_label.pack(side="left", padx=10, pady=10)
-
         self.folder_button = ctk.CTkButton(self.folder_frame, text="Browse", command=self.select_folder, fg_color="#0073e6")
         self.folder_button.pack(side="left", padx=10, pady=10)
 
@@ -101,38 +109,30 @@ class FileSorterApp(ctk.CTk):
         # --- Dynamic File Types Section ---
         self.file_types_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
         self.file_types_frame.pack(fill="both", padx=10, pady=(5, 10))
-
         # This section will be populated when a folder is selected.
         self.file_type_vars = {}
 
         # --- Action Selection Section (Copy/Move) ---
         self.action_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
         self.action_frame.pack(fill="x", padx=10, pady=(5, 10))
-
         self.action_label = ctk.CTkLabel(self.action_frame, text="Action:")
         self.action_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
-
         self.action_var = ctk.StringVar(value="copy")
         self.radio_copy = ctk.CTkRadioButton(self.action_frame, text="Copy", variable=self.action_var, value="copy", fg_color="#0073e6")
         self.radio_move = ctk.CTkRadioButton(self.action_frame, text="Move", variable=self.action_var, value="move", fg_color="#0073e6")
         self.radio_copy.grid(row=0, column=1, padx=10, pady=10)
         self.radio_move.grid(row=0, column=2, padx=10, pady=10)
-
         self.action_frame.grid_columnconfigure(3, weight=1)
 
         # --- Buttons Section: Process (Sort), Reset & Undo ---
         self.button_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
         self.button_frame.pack(fill="x", padx=10, pady=(5, 10))
-
-        self.process_button = ctk.CTkButton(self.button_frame, text="Sort Files", command=self.process_files, fg_color="#0073e6")
+        self.process_button = ctk.CTkButton(self.button_frame, text="Sortlify", command=self.process_files, fg_color="#0073e6")
         self.process_button.grid(row=0, column=0, padx=20, pady=10, sticky="ew")
-
         self.reset_button = ctk.CTkButton(self.button_frame, text="Reset", command=self.reset_ui, fg_color="#0073e6")
         self.reset_button.grid(row=0, column=1, padx=20, pady=10, sticky="ew")
-
         self.undo_button = ctk.CTkButton(self.button_frame, text="Undo", command=self.undo_last_action, fg_color="#0073e6")
         self.undo_button.grid(row=0, column=2, padx=20, pady=10, sticky="ew")
-
         self.button_frame.grid_columnconfigure(0, weight=1)
         self.button_frame.grid_columnconfigure(1, weight=1)
         self.button_frame.grid_columnconfigure(2, weight=1)
@@ -140,7 +140,6 @@ class FileSorterApp(ctk.CTk):
         # --- Progress Indicator Section ---
         self.progress_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
         self.progress_frame.pack(fill="x", padx=10, pady=(5, 10))
-
         self.progress_bar = ctk.CTkProgressBar(self.progress_frame)
         self.progress_bar.set(0)
         self.progress_bar.pack(fill="x", padx=10, pady=10)
@@ -210,25 +209,35 @@ class FileSorterApp(ctk.CTk):
         self.progress_bar.set(0)
         self.notification_label.configure(text="")
         # Reset line count
-        self.line_count_label.configure(text="Lines: 0")
+        self.line_count_label.configure(text="File names: 0")
 
     def process_files(self):
         if not self.selected_folder:
             messagebox.showerror("Error", "Please select a folder first!")
             return
+
+        # Check if the names_textbox is empty
+        names_input = self.names_textbox.get("1.0", "end").strip()
+        if not names_input:
+            messagebox.showerror("Error", "No file names provided. Please enter file names.")
+            return
+
         # Build the list of file extensions based on user selections.
         selected_extensions = []
         if self.file_type_vars:
             for ext, var in self.file_type_vars.items():
                 if var.get():
                     selected_extensions.append(ext)
+
         # If no checkboxes are selected, process all files.
         if not selected_extensions:
             selected_extensions = None
+
         # Read file names from the textbox (one per line).
-        names_input = self.names_textbox.get("1.0", "end").strip().splitlines()
+        names_input = names_input.splitlines()
         names_set = {name.strip() for name in names_input if name.strip()}
         action = self.action_var.get()  # Either "copy" or "move"
+
         # Run file processing in a separate thread.
         threading.Thread(
             target=self.process_files_thread,
@@ -260,9 +269,11 @@ class FileSorterApp(ctk.CTk):
         if total_files == 0:
             self.show_notification("No files matched the criteria.", error=True)
             return
+
         # Create a destination subfolder.
-        dest_folder = os.path.join(folder, f"{action}_files")
+        dest_folder = os.path.join(folder, "Sortlified")  # Changed folder name to "Sortlified"
         os.makedirs(dest_folder, exist_ok=True)
+
         processed_files = 0
         for idx, file in enumerate(files_to_process):
             src_path = os.path.join(folder, file)
@@ -283,6 +294,7 @@ class FileSorterApp(ctk.CTk):
             progress = (idx + 1) / total_files
             self.progress_bar.set(progress)
             time.sleep(0.1)  # Simulate processing time
+
         # Prepare the summary message.
         skipped_count = len(skipped_names)  # Count of names not found in the folder.
         summary_message = (
@@ -300,7 +312,7 @@ class FileSorterApp(ctk.CTk):
             return
         selected_extensions, names_set, action, files_to_process = self.last_action
         folder = self.selected_folder
-        dest_folder = os.path.join(folder, f"{action}_files")
+        dest_folder = os.path.join(folder, "Sortlified")  # Changed folder name to "Sortlified"
         for file in files_to_process:
             dest_path = os.path.join(dest_folder, file)
             if os.path.exists(dest_path):
@@ -323,7 +335,7 @@ class FileSorterApp(ctk.CTk):
         """Update the line count label based on the content of the names_textbox."""
         content = self.names_textbox.get("1.0", "end").strip()
         line_count = len(content.splitlines())
-        self.line_count_label.configure(text=f"Lines: {line_count}")
+        self.line_count_label.configure(text=f"File names: {line_count}")
 
     def paste_from_clipboard(self):
         """Paste text from the clipboard into the names_textbox."""
