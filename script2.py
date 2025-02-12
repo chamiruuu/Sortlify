@@ -28,7 +28,7 @@ class FileSorterApp(ctk.CTk):
 
         # ===== Left Frame: File Names Input =====
         self.left_frame = ctk.CTkFrame(self.main_frame, width=250, fg_color="#1a1a1a")
-        self.left_frame.grid(row=0, column=0, sticky="ns", padx=(0, 10), pady=10)
+        self.left_frame.grid(row=0, column=0, sticky="ns", padx=(10, 10), pady=10)  # Added extra padding to the left (20px)
         self.left_frame.grid_propagate(False)  # Keeps a fixed width
 
         self.names_label = ctk.CTkLabel(self.left_frame, text="File Names (one per line):")
@@ -39,7 +39,7 @@ class FileSorterApp(ctk.CTk):
 
         # ===== Right Frame: Folder, File Types, Action, Buttons, etc. =====
         self.right_frame = ctk.CTkFrame(self.main_frame, fg_color="#0d0d0d")
-        self.right_frame.grid(row=0, column=1, sticky="nsew", padx=(10, 0), pady=10)
+        self.right_frame.grid(row=0, column=1, sticky="nsew", padx=(0, 0), pady=10)
         self.right_frame.grid_columnconfigure(0, weight=1)
 
         # --- Folder Selection Section ---
