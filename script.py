@@ -7,6 +7,7 @@ import customtkinter as ctk
 from PIL import Image
 from tkinter import filedialog, messagebox
 
+
 def resource_path(relative_path):
     """Get the absolute path to a resource. Works for dev and PyInstaller."""
     try:
@@ -17,30 +18,39 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
+
 # Set the dark appearance mode.
 ctk.set_appearance_mode("dark")
+
 
 class FileSorterApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Sortlify")
-        self.geometry("1000x700")  # Default size for larger screens.
+        self.title("Sortlify by chamirurf")
+        self.geometry("800x600")  # Default size for larger screens.
         self.minsize(800, 600)  # Minimum window size
-        self.geometry("800x600")  # Ensure the window opens at the minimum size.
+
+        # Main container frame with dark background
+        self.main_frame = ctk.CTkFrame(self, fg_color="#0d0d0d", corner_radius=0)
+        self.main_frame.pack(fill="both", expand=True)
+
+        # Rest of the UI setup
         self.selected_folder = None
         self.last_action = None  # Store the last action for undo
         self.create_widgets()
 
     def create_widgets(self):
+        """Create the main UI widgets."""
         # Create a main container frame that splits the window into two columns.
-        self.main_frame = ctk.CTkFrame(self, fg_color="#0d0d0d")
-        self.main_frame.pack(fill="both", expand=True, padx=20, pady=20)
-        self.main_frame.grid_columnconfigure(0, weight=0)  # Left: fixed for file names
-        self.main_frame.grid_columnconfigure(1, weight=1)  # Right: expands
-        self.main_frame.grid_rowconfigure(0, weight=1)
+        self.inner_frame = ctk.CTkFrame(self.main_frame, fg_color="#0d0d0d")
+        self.inner_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        self.inner_frame.grid_columnconfigure(0, weight=0)  # Left: fixed for file names
+        self.inner_frame.grid_columnconfigure(1, weight=1)  # Right: expands
+        self.inner_frame.grid_rowconfigure(0, weight=1)
 
         # ===== Left Frame: File Names Input =====
-        self.left_frame = ctk.CTkFrame(self.main_frame, width=250, fg_color="#1a1a1a")
+        self.left_frame = ctk.CTkFrame(self.inner_frame, width=250, fg_color="#1a1a1a")
         self.left_frame.grid(row=0, column=0, sticky="ns", padx=(10, 10), pady=10)  # Added extra padding to the left (20px)
         self.left_frame.grid_propagate(False)  # Keeps a fixed width
 
@@ -81,7 +91,7 @@ class FileSorterApp(ctk.CTk):
         self.names_textbox.bind("<KeyRelease>", self.update_line_count)
 
         # ===== Right Frame: Folder, File Types, Action, Buttons, etc. =====
-        self.right_frame = ctk.CTkFrame(self.main_frame, fg_color="#0d0d0d")
+        self.right_frame = ctk.CTkFrame(self.inner_frame, fg_color="#0d0d0d")
         self.right_frame.grid(row=0, column=1, sticky="nsew", padx=(0, 0), pady=10)
         self.right_frame.grid_columnconfigure(0, weight=1)
 
@@ -109,7 +119,6 @@ class FileSorterApp(ctk.CTk):
         # --- Dynamic File Types Section ---
         self.file_types_frame = ctk.CTkFrame(self.right_frame, corner_radius=8, fg_color="#1a1a1a")
         self.file_types_frame.pack(fill="both", padx=10, pady=(5, 10))
-        # This section will be populated when a folder is selected.
         self.file_type_vars = {}
 
         # --- Action Selection Section (Copy/Move) ---
@@ -215,29 +224,24 @@ class FileSorterApp(ctk.CTk):
         if not self.selected_folder:
             messagebox.showerror("Error", "Please select a folder first!")
             return
-
         # Check if the names_textbox is empty
         names_input = self.names_textbox.get("1.0", "end").strip()
         if not names_input:
             messagebox.showerror("Error", "No file names provided. Please enter file names.")
             return
-
         # Build the list of file extensions based on user selections.
         selected_extensions = []
         if self.file_type_vars:
             for ext, var in self.file_type_vars.items():
                 if var.get():
                     selected_extensions.append(ext)
-
         # If no checkboxes are selected, process all files.
         if not selected_extensions:
             selected_extensions = None
-
         # Read file names from the textbox (one per line).
         names_input = names_input.splitlines()
         names_set = {name.strip() for name in names_input if name.strip()}
         action = self.action_var.get()  # Either "copy" or "move"
-
         # Run file processing in a separate thread.
         threading.Thread(
             target=self.process_files_thread,
@@ -269,11 +273,9 @@ class FileSorterApp(ctk.CTk):
         if total_files == 0:
             self.show_notification("No files matched the criteria.", error=True)
             return
-
         # Create a destination subfolder.
         dest_folder = os.path.join(folder, "Sortlified")  # Changed folder name to "Sortlified"
         os.makedirs(dest_folder, exist_ok=True)
-
         processed_files = 0
         for idx, file in enumerate(files_to_process):
             src_path = os.path.join(folder, file)
@@ -294,7 +296,6 @@ class FileSorterApp(ctk.CTk):
             progress = (idx + 1) / total_files
             self.progress_bar.set(progress)
             time.sleep(0.1)  # Simulate processing time
-
         # Prepare the summary message.
         skipped_count = len(skipped_names)  # Count of names not found in the folder.
         summary_message = (
@@ -345,6 +346,7 @@ class FileSorterApp(ctk.CTk):
             self.update_line_count()  # Update the line count after pasting
         except Exception as e:
             messagebox.showerror("Error", f"Failed to paste from clipboard: {str(e)}")
+
 
 if __name__ == "__main__":
     app = FileSorterApp()
