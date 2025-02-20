@@ -1,42 +1,42 @@
 # Sortlify
 
-Sortlify is a simple yet powerful file sorting utility that allows you to quickly copy or move files based on user-specified file names and file types. Built with CustomTkinter and Pillow, this application provides an intuitive, modern GUI for organizing your files.
+Sortlify is a lightweight file-sorting utility designed to help you quickly organize files by filtering based on user-specified names and file types. Built with CustomTkinter and Pillow, Sortlify provides a modern, dark-themed GUI for intuitive file management.
 
 ## Features
 
-### User-Friendly Interface
-- A sleek, dark-themed interface built with CustomTkinter.
+### Simple, Intuitive UI
+- A clean, dark-themed interface built using CustomTkinter for a modern look.
 
-### Flexible File Sorting
-- Filter and sort files by entering file names (one per line) and selecting file types.
+### Flexible File Filtering
+- Specify file names (one per line) and select file types to target specific files.
 
-### Clipboard Support
-- Easily paste file names from your clipboard using the integrated paste button.
+### Clipboard Integration
+- Easily paste file names directly from your clipboard using the integrated paste button.
 
-### Progress & Notifications
-- Visual progress bar and on-screen notifications inform you as the process runs.
+### Progress Tracking
+- A real-time progress bar and on-screen notifications keep you informed during the sorting process.
 
-### Undo Functionality
-- Quickly revert the last file operation if needed.
+### Undo Capability
+- Quickly revert the last file operation if you need to correct any mistakes.
 
-### Cross-Platform Compatibility
-- Works on Windows, macOS, and Linux (with Python and necessary dependencies installed).
+### Cross-Platform
+- Works on Windows, macOS, and Linux (with Python and required libraries installed).
 
 ## Prerequisites
 
-- Python 3.7 or higher
-- Required packages:
+- Python 3.7+
+- Required Libraries:
   - CustomTkinter
   - Pillow (PIL)
-  - Tkinter (typically included with Python)
+  - Tkinter (typically included with standard Python installations)
 
 ## Installation
 
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/sortlify.git
-    cd sortlify
+    git clone https://github.com/chamiruuu/Sortlify.git
+    cd Sortlify
     ```
 
 2. Install dependencies:
@@ -47,46 +47,54 @@ Sortlify is a simple yet powerful file sorting utility that allows you to quickl
     pip install customtkinter Pillow
     ```
 
-3. Run the application:
+3. Ensure Resources are in Place:
+
+    Make sure the `pasteicon.png` file is located in the repository’s root directory or the appropriate resources folder as referenced in the code.
+
+4. Run the Application:
+
+    Launch the application with:
 
     ```bash
     python script.py
     ```
 
-    (Make sure the [pasteicon.png](http://_vscodecontentref_/1) file is located in the same directory or in the appropriate resources folder.)
-
 ## How It Works
 
-### Folder Selection
-Click the "Browse" button to choose the folder containing the files you want to sort.
+### Select a Folder
+Click the "Browse" button to choose the folder that contains the files you want to sort.
 
 ### Enter File Names
-In the left panel, enter file names (one per line) that you wish to process. You can also click the paste button (with a paste icon) to insert file names from your clipboard.
+In the left panel, type the names (one per line) of the files you wish to process. You can also click the paste button (with the paste icon) to insert file names from your clipboard.
 
-### Select File Types (Optional)
-The application dynamically lists available file types from the selected folder. Check the file types you want to filter on; if none are selected, all file types will be processed.
+### Choose File Types
+On selecting a folder, the app scans and displays the available file types. Check the boxes corresponding to the file types you want to filter. If none are selected, all file types will be processed.
 
-### Choose the Action
-Decide whether to Copy or Move the files using the radio buttons.
+### Select Action
+Use the radio buttons to choose between Copy or Move:
+- **Copy**: Duplicates the files into a subfolder.
+- **Move**: Transfers the files into a subfolder.
 
-### Sort Files
-Click the "Sortlify" button. The app will create a subfolder called "Sortlified" in your selected folder and begin processing. A progress bar and notifications keep you updated on the operation’s status.
+### Process Files
+Click the "Sortlify" button to begin processing. A new subfolder named "Sortlified" will be created within the selected folder, and files matching your criteria will be copied or moved accordingly.
 
-### Undo Last Action
-If necessary, click the "Undo" button to revert the last file operation.
+### Undo Action
+If you need to revert the last operation, simply click the "Undo" button to restore files to their original location.
 
-### Reset
-The "Reset" button clears all inputs and selections, allowing you to start fresh.
+### Reset Interface
+Use the "Reset" button to clear all selections and inputs, allowing you to start a new sorting session.
 
 ## File Structure
 
-- [script.py](http://_vscodecontentref_/2): The main Python script that runs the application.
-- [pasteicon.png](http://_vscodecontentref_/3): Icon used for the paste button.
-- (Additional resource files if any.)
+- `script.py`: Main script that contains the application code.
+- `pasteicon.png`: Icon used for the paste functionality in the GUI.
+- (Other resource files, if any, should be included in the repository as needed.)
 
 ## Contributing
 
-Contributions are welcome! If you have suggestions, bug fixes, or enhancements, please open an issue or submit a pull request.
+Contributions are welcome! If you find bugs or have ideas for improvements, please:
+- Open an issue to discuss your suggestions.
+- Submit a pull request with your proposed changes.
 
 ## License
 
@@ -94,5 +102,6 @@ This project is licensed under the MIT License.
 
 ## Acknowledgements
 
-- Built using [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter)
-- Icon image courtesy of its respective creator
+- CustomTkinter for the modern UI framework.
+- Pillow for image processing support.
+- Thanks to all contributors and users who help improve the project!
